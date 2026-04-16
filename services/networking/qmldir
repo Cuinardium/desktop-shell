@@ -1,0 +1,3 @@
+module Networking
+singleton Ethernet 1.0 Ethernet.qml
+singleton Stats 1.0 Stats.qml

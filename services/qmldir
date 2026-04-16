@@ -1,0 +1,4 @@
+# services/qmldir
+module services.networking
+singleton Audio 1.0 Audio.qml
+singleton Time 1.0 Time.qml
