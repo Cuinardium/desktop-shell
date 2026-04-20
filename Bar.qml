@@ -57,6 +57,7 @@ Scope {
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: 12
 
+                    NetworkWidget {}
                     AudioWidget {}
                     ClockWidget {}
                 }

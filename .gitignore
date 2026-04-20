@@ -1,3 +1,5 @@
 
 style/Theme.qml
 .qmlls.ini
+.agents/
+skills-lock.json

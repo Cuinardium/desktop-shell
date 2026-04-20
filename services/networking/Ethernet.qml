@@ -98,7 +98,6 @@ Singleton {
             });
 
             root.available = hasEth;
-            root.connected = ethConnected;
             root.connectivity = connectivityStatus;
 
             console.debug(`Ethernet update: Eth:${hasEth} ConnStatus:${connectivityStatus}`);
