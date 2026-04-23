@@ -1,57 +1,64 @@
 import QtQuick
+import QtQuick.Layouts
 
-import "../components"
-import "../services" as Services
-import "../style"
-import "../style/motions"
+import qs.components
+import qs.services
+import qs.style
+import qs.style.motions
 
-ClickablePill {
+RowLayout {
     id: root
-    onClicked: Services.Audio.toggleMute()
-    onWheeled: wheel => {
-        if (wheel.angleDelta.y > 0)
-            Services.Audio.adjustVolume(0.02);
-        else
-            Services.Audio.adjustVolume(-0.02);
+
+    property real animatedVolume: Audio.volume
+    Behavior on animatedVolume {
+        Anim {
+            type: Anim.Type.StandardSmall
+        }
     }
 
-    property real animatedVolume: Services.Audio.volume
-    NumberMotion on animatedVolume {}
-
-    readonly property string icon: Services.Audio.muted ? "󰝟" : animatedVolume > 0 ? (animatedVolume <= 0.4 ? "" : "") : ""
+    readonly property string icon: Audio.muted ? "volume_off" : animatedVolume > 0 ? (animatedVolume <= 0.4 ? "volume_down" : "volume_up") : "volume_mute"
     readonly property string volume_text: Math.round(animatedVolume * 100) + "%"
 
-    Item {
-        implicitWidth: 15
-        height: iconText.height
-
-        Text {
-            id: iconText
-            anchors.centerIn: parent
-            text: icon
-            color: Services.Audio.muted ? Theme.error : Theme.primary
-            font.pixelSize: 26
-
-            SwapMotion on text {
-                item: iconText
-                prop: "text"
+    MaterialIcon {
+        id: volumeIcon
+        Layout.leftMargin: Tokens.appearance.padding.smaller
+        text: icon
+        color: Audio.muted ? Theme.error : Theme.primary
+        SwapMotion on text {
+            item: volumeIcon
+            prop: "text"
+        }
+        Behavior on color {
+            Anim {
+                type: Anim.Type.StandardSmall
             }
-            ColorMotion on color {}
         }
     }
 
     // Volume Text Container
     Item {
-        implicitWidth: 25
+        Layout.rightMargin: Tokens.appearance.padding.smaller
+        implicitWidth: 30
 
         height: volumeLabel.height
 
-        Text {
+        StyledText {
             id: volumeLabel
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: parent.right
+            Layout.alignment: Qt.AlignRight
             text: volume_text
-            color: Theme.on_surface
+        }
+    }
+
+    StateLayer {
+        effectColor: Theme.primary
+        radius: Tokens.appearance.rounding.extraSmall
+
+        onClicked: Audio.toggleMute()
+        onWheeled: wheel => {
+            if (wheel.angleDelta.y > 0)
+                Audio.adjustVolume(0.02);
+            else
+                Audio.adjustVolume(-0.02);
         }
     }
 }

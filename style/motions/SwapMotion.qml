@@ -1,4 +1,5 @@
 import QtQuick
+import qs.style
 
 Behavior {
     id: root
@@ -9,18 +10,27 @@ Behavior {
 
     SequentialAnimation {
         // Fade out
-        NumberAnimation { 
-            target: item; property: "opacity"; 
-            to: 0; duration: root.outDuration
+        Anim {
+            target: item
+            property: "opacity"
+            to: 0
+            duration: Tokens.appearance.animDurations.small
+            easing.bezierCurve: Tokens.appearance.curves.standardAccel
         }
-        
+
         // Instant swap
-        PropertyAction { target: item; property: prop }
-        
+        PropertyAction {
+            target: item
+            property: prop
+        }
+
         // Fade in
-        NumberAnimation { 
-            target: item; property: "opacity"; 
-            to: 1; duration: root.inDuration
+        NumberAnimation {
+            target: item
+            property: "opacity"
+            to: 1
+            duration: Tokens.appearance.animDurations.normal
+            easing.bezierCurve: Tokens.appearance.curves.standardDecel
         }
     }
 }

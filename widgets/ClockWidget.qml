@@ -1,24 +1,26 @@
 import QtQuick
+import QtQuick.Layouts
 import Quickshell.Networking
 
-import "../style"
-import "../components"
-import "../services/networking" as Networking
-import "../services" as Services 
+import qs.style
+import qs.components
+import qs.services
 
-Pill {
-    Text {
-        text: Services.Time.date
-        color: Theme.on_surface
-        font.pixelSize: 14
+RowLayout {
+    spacing: Tokens.appearance.spacing.smaller
+
+    StyledText {
+        text: Time.time
+        color: Theme.primary
+        font.bold: true
+        Layout.fillHeight: true
+        verticalAlignment: Text.AlignVCenter
     }
 
-    Divider {}
-
-    Text {
-        text: Services.Time.time
-        color: Theme.primary
-        font.pixelSize: 14
-        font.bold: true
+    StyledText {
+        text: Time.date
+        font.pointSize: Tokens.appearance.fontSize.smaller
+        Layout.fillHeight: true
+        verticalAlignment: Text.AlignVCenter
     }
 }

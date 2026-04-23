@@ -1,27 +1,23 @@
 import QtQuick
+import QtQuick.Layouts
 
-import "../components"
-import "../style"
-import "../services/networking" as Networking
+import Quickshell.Networking
 
-Pill {
-    Text {
+import qs.components
+import qs.style
+
+RowLayout {
+    property var currentDevice: Networking.devices.values.find(d => d.connected)
+    property var connectivity: Networking.connectivity
+
+    property string icon: currentDevice.type === DeviceType.Wired ? "lan" : "wifi"
+
+    MaterialIcon {
         color: Theme.primary
-        font {
-            bold: true
-            pixelSize: 22
-        }
-        text: "󰌗"
-        opacity: Networking.Ethernet.available ? 1 : 0
+        text: icon
     }
 
-    Text {
-        color: Theme.primary
-        font {
-            bold: true
-            pixelSize: Tokens.font.size.normal
-        }
-        text: Networking.Ethernet.connectivity
-        opacity: Networking.Ethernet.available ? 1 : 0
+    StyledText {
+        text: currentDevice.name
     }
 }

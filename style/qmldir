@@ -1,6 +1,4 @@
 # style/qmldir
 module style
 singleton Theme 1.0 Theme.qml
-
-# Regular components in this folder (if any) don't need the 'singleton' keyword
-# but they should be listed if you want to use them via the module name.
+singleton Tokens 1.0 Tokens.qml

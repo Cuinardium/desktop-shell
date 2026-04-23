@@ -4,7 +4,7 @@ import "../style"
 
 Rectangle {
     width: 1
-    Layout.fillHeight: true
-    color: Theme.outline_variant
+    color: Theme.outline
     Layout.alignment: Qt.AlignVCenter
+    opacity: 0.3
 }

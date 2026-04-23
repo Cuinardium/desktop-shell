@@ -1,20 +1,24 @@
 import Quickshell // for PanelWindow
 import Quickshell.Hyprland // for HyprlandMonitor
+import Quickshell.Networking
 import QtQuick // for Text
 import QtQuick.Layouts
 
-import Quickshell.Networking
-import "widgets"
-import "style"
+import qs.widgets
+import qs.style
+import qs.components
 
 Scope {
     Variants {
         model: Quickshell.screens
 
         PanelWindow {
+            id: bar
 
             required property var modelData
             property HyprlandMonitor hyprland_monitor: Hyprland.monitors.values.find(m => m.name === modelData.name)
+
+                    property var index: 0
 
             screen: modelData
             anchors {
@@ -23,23 +27,28 @@ Scope {
                 right: true
             }
 
+            implicitHeight: 40
             color: "transparent"
 
-            implicitHeight: 40
+            BarBackground {}
 
             // Inside your main bar/panel file
             Item {
                 id: barContainer
                 anchors.fill: parent
+                anchors.leftMargin: Tokens.appearance.padding.larger
+                anchors.rightMargin: Tokens.appearance.padding.larger
 
                 // 1. LEFT SIDE: Put things here you want on the left
                 RowLayout {
                     anchors.left: parent.left
-                    anchors.leftMargin: 10
+                    anchors.leftMargin: Tokens.appearance.padding.small
                     anchors.verticalCenter: parent.verticalCenter
-                    spacing: 12
+                    spacing: Tokens.appearance.spacing.small
 
                     // Add logos, system info, etc. here
+                    AgentWidget {}
+                    MprisWidget {}
                 }
 
                 // 2. ABSOLUTE CENTER: The Workspaces Widget
@@ -53,12 +62,19 @@ Scope {
                 // 3. RIGHT SIDE: The Clock/Pill
                 RowLayout {
                     anchors.right: parent.right
-                    anchors.rightMargin: 10
-                    anchors.verticalCenter: parent.verticalCenter
-                    spacing: 12
+                    anchors.rightMargin: Tokens.appearance.padding.small
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    spacing: Tokens.appearance.spacing.small
 
-                    NetworkWidget {}
-                    AudioWidget {}
+                    RowLayout {
+                        spacing: Tokens.appearance.spacing.smaller
+                        NetworkWidget {}
+                        AudioWidget {}
+                    }
+                    Divider {
+                        Layout.preferredHeight: bar.height * 0.6
+                    }
                     ClockWidget {}
                 }
             }
