@@ -5,8 +5,7 @@ Behavior {
     id: root
     property real outDuration: 100
     property real inDuration: 200
-    property var item: targetItem
-    property string prop: targetProperty
+    property var item
 
     SequentialAnimation {
         // Fade out
@@ -20,8 +19,6 @@ Behavior {
 
         // Instant swap
         PropertyAction {
-            target: item
-            property: prop
         }
 
         // Fade in

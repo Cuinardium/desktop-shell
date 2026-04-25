@@ -12,8 +12,8 @@ Canvas {
     onPaint: {
         var ctx = getContext("2d");
         ctx.reset();
-        ctx.fillStyle = Theme.surface;
-        ctx.globalAlpha = 0.9;
+        ctx.fillStyle = Theme.background;
+        ctx.globalAlpha = 1;
 
         var w = width;
         var h = height;

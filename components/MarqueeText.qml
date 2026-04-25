@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
 
 import qs.style
+import qs.style.motions
 
 Item {
     id: marqueeRoot
@@ -10,17 +11,29 @@ Item {
     required property string title
     property color textColor: Theme.primary
     property real textOpacity: 1
-    readonly property int gap: Tokens.appearance.spacing.large // Space between loops
+    readonly property int gap: Tokens.appearance.spacing.large
 
+    readonly property int maxWidth: 200
 
-    Layout.preferredWidth: 200
+    // 1. Define the threshold logic
+    readonly property bool shouldScroll: text1.width > maxWidth
+
+    Layout.preferredWidth: Math.min(text1.width, maxWidth)
     Layout.fillHeight: true
     clip: true
+
+    SwapMotion on title {
+        item: textRow
+        // Only run the swap animation if we ALREADY have text.
+        // If it's empty, update instantly so the parent pill can calculate its s
+        enabled: text1.text !== ""
+    }
 
     Item {
         id: maskSource
         anchors.fill: parent
-        visible: false
+        // 2. Show the raw source only if we AREN'T scrolling
+        visible: !marqueeRoot.shouldScroll
         clip: true
 
         Row {
@@ -28,7 +41,6 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             spacing: marqueeRoot.gap
 
-            // First instance of the text
             StyledText {
                 id: text1
                 text: marqueeRoot.title
@@ -36,28 +48,31 @@ Item {
                 opacity: marqueeRoot.textOpacity
             }
 
-            // Second instance (the one that follows immediately)
             StyledText {
                 id: text2
                 text: marqueeRoot.title
                 color: marqueeRoot.textColor
                 opacity: marqueeRoot.textOpacity
-
-                // Only visible if the text is actually long enough to scroll
-                visible: scrollAnim.running
+                // 3. Only run the second text and animation if threshold is met
             }
 
             NumberAnimation on x {
                 id: scrollAnim
                 from: 0
-                // Move by the width of one text item + the gap
                 to: -(text1.width + marqueeRoot.gap)
-                duration: 20000
+                duration: 13000
                 loops: Animation.Infinite
-                // Only run if the text is wider than the container
-                running: text1.width > marqueeRoot.width
+                running: marqueeRoot.shouldScroll // Simplified logic
             }
         }
+    }
+
+    // 4. Only enable the mask logic if the text is actually scrolling
+    OpacityMask {
+        anchors.fill: parent
+        source: maskSource
+        maskSource: maskGradient
+        visible: marqueeRoot.shouldScroll
     }
 
     LinearGradient {
@@ -67,7 +82,6 @@ Item {
         end: Qt.point(marqueeRoot.width, 0)
         visible: false
         gradient: Gradient {
-            // 1. Soft Entrance: The text fades in quickly after the icon
             GradientStop {
                 position: 0.0
                 color: "transparent"
@@ -76,14 +90,10 @@ Item {
                 position: 0.08
                 color: "black"
             }
-
-            // 2. Solid Middle
             GradientStop {
                 position: 0.85
                 color: "black"
             }
-
-            // 3. Soft Exit: The text fades out into the bar
             GradientStop {
                 position: 1.0
                 color: "transparent"
@@ -91,15 +101,9 @@ Item {
         }
     }
 
-    OpacityMask {
-        anchors.fill: parent
-        source: maskSource
-        maskSource: maskGradient
-    }
-
-    // Reset the animation whenever the song changes
     onTitleChanged: {
         textRow.x = 0;
-        scrollAnim.restart();
+        if (shouldScroll)
+            scrollAnim.restart();
     }
 }

@@ -7,13 +7,18 @@ import qs.components
 Item {
     id: root
     
-    property real progress: 0.0 
-    property string iconName: "play_arrow"
+    required property real progress
+    required property string iconName
+    property bool clickable: false
+    property int iconPointSize: 10
+    property int verticalOffset: 0
+    property color color: Theme.primary
     
     implicitWidth: innerIcon.implicitWidth + Tokens.appearance.padding.medium
     implicitHeight: implicitWidth
 
     signal clicked()
+    signal wheeled(var wheel)
 
     // Drawing both paths in the same Shape guarantees they use 
     // the exact same coordinate math and rendering pipeline.
@@ -28,7 +33,7 @@ Item {
         // 1. The Empty Background Track (Replaces the Rectangle)
         ShapePath {
             fillColor: "transparent"
-            strokeColor: Qt.alpha(Theme.primary, 0.15)
+            strokeColor: Qt.alpha(root.color, 0.15)
             strokeWidth: 2
             capStyle: ShapePath.RoundCap
 
@@ -48,7 +53,7 @@ Item {
         // 2. The Active Progress Arc
         ShapePath {
             fillColor: "transparent" 
-            strokeColor: Theme.primary
+            strokeColor: root.color
             strokeWidth: 2
             capStyle: ShapePath.RoundCap
 
@@ -71,21 +76,22 @@ Item {
     MaterialIcon {
         id: innerIcon
         anchors.centerIn: parent
-        anchors.verticalCenterOffset: 1
+        anchors.verticalCenterOffset: root.verticalOffset
 
         text: root.iconName
-        color: Theme.primary
-        font.pointSize: 10
+        color: root.color
+        font.pointSize: root.iconPointSize
 
         SwapMotion on text {
             item: innerIcon
-            prop: "text"
         }
     }
 
     StateLayer {
         radius: Tokens.appearance.rounding.full
-        effectColor: Theme.primary
+        effectColor: root.color
         onClicked: root.clicked()
+        onWheeled: wheel => root.wheeled(wheel)
+        visible: root.clickable
     }
 }
