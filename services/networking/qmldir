@@ -1,3 +1,0 @@
-module Networking
-singleton Networking 1.0 Networking.qml
-singleton Stats 1.0 Stats.qml

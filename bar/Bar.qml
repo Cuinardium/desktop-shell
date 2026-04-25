@@ -2,7 +2,6 @@ pragma ComponentBehavior: Bound
 
 import Quickshell
 import Quickshell.Hyprland
-import Quickshell.Networking
 import QtQuick
 import QtQuick.Layouts
 
@@ -10,7 +9,6 @@ import qs.bar.widgets.workspace
 import qs.bar.widgets
 import qs.panels.power_menu
 import qs.style
-import qs.components
 
 Scope {
     Variants {
@@ -59,7 +57,6 @@ Scope {
                 property var monitorBridge: bar.hyprland_monitor
             }
         }
-
     }
 
     // Power Menu Panel

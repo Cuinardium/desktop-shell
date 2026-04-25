@@ -84,7 +84,7 @@ Rectangle {
                 target: pill.activePlayer
                 function onPlaybackStateChanged() {
                     if (!pill.activePlayer)
-                        return;
+                    return;
                     if (pill.activePlayer.isPlaying) {
                         debounceTimer.stop();
                         playPauseIcon.debouncedPlaying = true;

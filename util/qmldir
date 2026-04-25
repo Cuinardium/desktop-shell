@@ -1,3 +1,0 @@
-# util/qmldir
-module util
-singleton IconMap 1.0 IconMap.qml

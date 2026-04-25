@@ -13,11 +13,11 @@ ProgressIcon {
     Layout.preferredHeight: 24
 
     iconPointSize: 12
-    
+
     property real animatedVolume: Audio.volume
     Behavior on animatedVolume {
-        Anim { 
-            type: Anim.Type.StandardSmall 
+        Anim {
+            type: Anim.Type.StandardSmall
         }
     }
 
@@ -29,17 +29,17 @@ ProgressIcon {
 
     // Animate the color transition when muting/unmuting
     Behavior on color {
-        Anim { 
-            type: Anim.Type.StandardSmall 
+        Anim {
+            type: Anim.Type.StandardSmall
         }
     }
 
     onClicked: Audio.toggleMute()
-    
+
     onWheeled: wheel => {
         if (wheel.angleDelta.y > 0)
-            Audio.adjustVolume(0.02)
+            Audio.adjustVolume(0.02);
         else
-            Audio.adjustVolume(-0.02)
+            Audio.adjustVolume(-0.02);
     }
 }

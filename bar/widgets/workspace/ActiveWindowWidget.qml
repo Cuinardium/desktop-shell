@@ -2,7 +2,7 @@ import QtQuick
 import Quickshell.Hyprland
 import QtQuick.Layouts
 
-import "../style"
+import qs.style
 
 RowLayout {
     required property HyprlandMonitor monitor
