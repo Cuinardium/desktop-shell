@@ -1,13 +1,13 @@
 pragma Singleton
 
+import QtQuick
 import Quickshell
 import Quickshell.Services.Pipewire
 
 Singleton {
     id: root
-    
-    // Create safe intermediate references
-    readonly property var activeSink: sinkTracker.objects.length > 0 ? sinkTracker.objects[0] : null
+
+    property var activeSink: null
     readonly property var sinkAudio: activeSink ? activeSink.audio : null
 
     // Safe bindings that react to the tracker
@@ -16,14 +16,31 @@ Singleton {
 
     readonly property var programs: programsTracker.objects
 
+    function refreshDefaultSink() {
+        activeSink = Pipewire.defaultAudioSink ?? null;
+    }
+
     PwObjectTracker {
         id: sinkTracker
-        objects: Pipewire.defaultAudioSink ? [Pipewire.defaultAudioSink] : []
+        objects: root.activeSink ? [root.activeSink] : []
     }
 
     PwObjectTracker {
         id: programsTracker
         objects: Pipewire.nodes.values.filter(node => node.isStream)
+    }
+
+    Connections {
+        target: Pipewire
+
+        function onDefaultAudioSinkChanged() {
+            root.refreshDefaultSink();
+        }
+    }
+
+    Component.onCompleted: {
+        root.refreshDefaultSink();
+        Qt.callLater(root.refreshDefaultSink);
     }
 
     function toggleMute() {

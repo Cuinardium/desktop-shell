@@ -6,6 +6,8 @@ import QtQuick
 Singleton {
     id: iconMapper
 
+    property var _memoizedMatches: ({})
+
     readonly property var map: {
         // Misc
         // "qbittorrent": {
@@ -408,15 +410,24 @@ Singleton {
             };
         }
 
-        let key = String(appId).toLowerCase();
+        const key = String(appId).toLowerCase();
 
-        if (map[key] !== undefined) {
-            return map[key];
-        }
+        const cached = _memoizedMatches[key];
+        if (cached !== undefined)
+            return cached;
 
-        return {
-            title: "Unknown",
-            icon: "󰣆"
-        };
+        let match;
+
+        if (map[key] !== undefined)
+            match = map[key];
+        else
+            match = {
+                title: "Unknown",
+                icon: "󰣆"
+            };
+
+        _memoizedMatches[key] = match;
+
+        return match;
     }
 }

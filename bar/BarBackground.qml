@@ -15,19 +15,19 @@ Canvas {
     }
 
     onPaint: {
-        var ctx = getContext("2d");
+        const ctx = getContext("2d");
         ctx.reset();
         ctx.fillStyle = Theme.background;
         ctx.globalAlpha = 1;
 
-        var w = width;
-        var h = height;
+        const w = width;
+        const h = height;
 
         // --- CONFIGURATION ---
-        var sideMargin = 10;    // Gap between screen edge and main bar body
-        var r = Tokens.appearance.rounding.normal;            // The height/tightness of the "S" curve
-        var topVertical = 5;   // <--- This is the "fill" you wanted at the top
-        var bottomR = Tokens.appearance.rounding.extraSmall;       // Standard rounded corner for the bottom
+        const sideMargin = 10;
+        const r = Tokens.appearance.rounding.normal;
+        const topVertical = 5;
+        const bottomR = Tokens.appearance.rounding.extraSmall;
         // ---------------------
 
         ctx.beginPath();

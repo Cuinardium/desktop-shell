@@ -11,9 +11,9 @@ import qs.style.motions
 Rectangle {
     id: pill
 
-    property var activePlayer: Mpris.players.values[0]
+    property var activePlayer: Mpris.players.values?.[0] ?? null
 
-    readonly property bool isActive: activePlayer !== undefined
+    readonly property bool isActive: activePlayer != null
 
     // ── Capability flags — siempre derivados del player activo ─────────────
     readonly property bool canTogglePlaying: isActive && activePlayer.canTogglePlaying
@@ -81,10 +81,11 @@ Rectangle {
             }
 
             Connections {
-                target: pill.activePlayer ?? null
+                target: pill.activePlayer
+                enabled: pill.activePlayer != null
                 function onPlaybackStateChanged() {
                     if (!pill.activePlayer)
-                    return;
+                        return;
                     if (pill.activePlayer.isPlaying) {
                         debounceTimer.stop();
                         playPauseIcon.debouncedPlaying = true;
@@ -107,6 +108,7 @@ Rectangle {
 
         MarqueeText {
             title: pill.activePlayer?.trackTitle ?? ""
+            Layout.maximumWidth: maxWidth
         }
     }
 }

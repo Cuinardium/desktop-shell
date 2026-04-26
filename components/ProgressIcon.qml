@@ -15,7 +15,7 @@ Item {
     property color color: Theme.primary
     
     implicitWidth: innerIcon.implicitWidth + Tokens.appearance.padding.medium
-    implicitHeight: implicitWidth
+    implicitHeight: innerIcon.implicitHeight + Tokens.appearance.padding.medium
 
     signal clicked()
     signal wheeled(var wheel)

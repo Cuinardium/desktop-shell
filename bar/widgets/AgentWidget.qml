@@ -19,6 +19,7 @@ Item {
     }
 
     StateLayer {
+        anchors.fill: parent
         effectColor: Theme.primary
         radius: Tokens.appearance.rounding.extraSmall
     }

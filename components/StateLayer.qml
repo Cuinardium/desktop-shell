@@ -1,5 +1,5 @@
 import QtQuick
-import Qt5Compat.GraphicalEffects
+import QtQuick.Effects
 import qs.style
 import qs.style.motions
 
@@ -21,25 +21,22 @@ Item {
     signal released(var mouse)
     signal wheeled(var wheel)
 
-    // 1. The Mask
-    // This defines the exact rounded shape we want to clip to.
+    // Visual Effects Container — clips hover and ripple to rounded shape
     Rectangle {
         id: maskRect
         anchors.fill: parent
         radius: root.radius
-        color: "black" // Color doesn't matter, it just needs to be solid
-        visible: false // Hidden because it's only used as a mask
+        color: "black"
+        opacity: 0
+        layer.enabled: true
     }
 
-    // 2. The Visual Effects Container
-    // We group the hover and ripple effects here so we can mask them together.
     Item {
         id: effectContainer
         anchors.fill: parent
-        
-        // Allocate FBO only during interaction — idle instances cost no VRAM
-        layer.enabled: mouseArea.containsMouse || pressAnim.running || releaseAnim.running
-        layer.effect: OpacityMask {
+        layer.enabled: true
+        layer.effect: MultiEffect {
+            maskEnabled: true
             maskSource: maskRect
         }
 
@@ -47,12 +44,14 @@ Item {
         Rectangle {
             id: hoverLayer
             anchors.fill: parent
+            radius: root.radius
             color: root.effectColor
-            // No need for radius here anymore, the mask handles it
             opacity: mouseArea.containsMouse && !mouseArea.pressed ? root.hoverOpacity : 0.0
 
             Behavior on opacity {
-                Anim { type: Anim.FastSpatial } 
+                Anim {
+                    type: Anim.FastSpatial
+                }
             }
         }
 
@@ -60,7 +59,7 @@ Item {
         Rectangle {
             id: ripple
             property real maxSize: Math.sqrt(Math.pow(root.width, 2) + Math.pow(root.height, 2)) * 2
-            
+
             width: 0
             height: width
             radius: width / 2
@@ -82,30 +81,30 @@ Item {
 
         cursorShape: Qt.PointingHandCursor
 
-        onPressed: (mouse) => {
-            ripple.x = mouse.x
-            ripple.y = mouse.y
-            ripple.width = 0
-            ripple.opacity = root.pressOpacity
-            pressAnim.restart()
-            root.pressed(mouse)
+        onPressed: mouse => {
+            ripple.x = mouse.x;
+            ripple.y = mouse.y;
+            ripple.width = 0;
+            ripple.opacity = root.pressOpacity;
+            pressAnim.restart();
+            root.pressed(mouse);
         }
 
-        onReleased: (mouse) => {
-            releaseAnim.restart()
-            root.released(mouse)
+        onReleased: mouse => {
+            releaseAnim.restart();
+            root.released(mouse);
         }
 
         onCanceled: {
-            releaseAnim.restart()
+            releaseAnim.restart();
         }
 
-        onClicked: (mouse) => {
-            root.clicked(mouse)
+        onClicked: mouse => {
+            root.clicked(mouse);
         }
 
-        onWheel: (wheel) => {
-            root.wheeled(wheel)
+        onWheel: wheel => {
+            root.wheeled(wheel);
         }
     }
 
@@ -116,7 +115,7 @@ Item {
             target: ripple
             property: "width"
             to: ripple.maxSize
-            type: Anim.Emphasized 
+            type: Anim.Emphasized
         }
     }
 
@@ -126,7 +125,7 @@ Item {
             target: ripple
             property: "opacity"
             to: 0
-            type: Anim.Standard 
+            type: Anim.Standard
         }
     }
 }

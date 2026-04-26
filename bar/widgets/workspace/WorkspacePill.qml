@@ -13,7 +13,7 @@ Item {
     id: root
 
     // --- API pública: entradas ---
-    required property var   modelData
+    required property var modelData
     required property HyprlandMonitor monitor
 
     // --- API pública: señales ---
@@ -24,14 +24,12 @@ Item {
 
     // --- Propiedades derivadas del modelo ---
     readonly property bool isCurrentMonitor: !!root.monitor && !!modelData?.monitor && (modelData.monitor.name === root.monitor.name)
-    readonly property bool isActive:         modelData.active
-    readonly property bool isFocused:        modelData.focused
-    readonly property var  windows:          modelData.toplevels.values
-    readonly property bool isEmpty:          windows.length <= 0
-    readonly property bool hasManyWindows:   windows.length > 1
-readonly property string icons: windows.slice(0, 3)
-        .map(t => IconMap.getMatch(t?.wayland?.appId ?? "").icon)
-        .join(" ")
+    readonly property bool isActive: modelData.active
+    readonly property bool isFocused: modelData.focused
+    readonly property var windows: modelData.toplevels.values
+    readonly property bool isEmpty: windows.length <= 0
+    readonly property bool hasManyWindows: windows.length > 1
+    readonly property string icons: windows.slice(0, 3).map(t => IconMap.getMatch(t?.wayland?.appId ?? "").icon).join(" ")
 
     // --- Sizing ---
     height: 22
@@ -39,21 +37,24 @@ readonly property string icons: windows.slice(0, 3)
     clip: true  // enmascara iconos entrantes hasta que el ancho se expande
 
     readonly property real targetWidth: {
-        if (!isCurrentMonitor)    return 0
-        if (isEmpty || !hasManyWindows) return height
-        return iconText.width + (isFocused
-            ? Tokens.appearance.padding.larger
-            : Tokens.appearance.padding.normal)
+        if (!isCurrentMonitor)
+            return 0;
+        if (isEmpty || !hasManyWindows)
+            return height;
+        return iconText.width + (isFocused ? Tokens.appearance.padding.larger : Tokens.appearance.padding.normal);
     }
 
     width: targetWidth
 
     // --- Notificar al padre cuando cambia la geometría y estamos enfocados ---
     // Usamos señales en lugar de Binding con target externo.
-    onXChanged:     if (isFocused && isCurrentMonitor) focusedGeometryChanged(x, width)
-    onWidthChanged: if (isFocused && isCurrentMonitor) focusedGeometryChanged(x, width)
+    onXChanged: if (isFocused && isCurrentMonitor)
+        focusedGeometryChanged(x, width)
+    onWidthChanged: if (isFocused && isCurrentMonitor)
+        focusedGeometryChanged(x, width)
     onIsFocusedChanged: {
-        if (isFocused && isCurrentMonitor) focusedGeometryChanged(x, width)
+        if (isFocused && isCurrentMonitor)
+            focusedGeometryChanged(x, width);
     }
 
     // --- Contenido: íconos de ventanas ---
@@ -62,18 +63,30 @@ readonly property string icons: windows.slice(0, 3)
         anchors.centerIn: parent
         visible: !root.isEmpty
 
-        color:          root.isFocused ? Theme.surface_container_highest : Theme.secondary
-        text:           root.icons
-        wrapMode:       Text.NoWrap
-        font.bold:      true
+        color: root.isFocused ? Theme.surface_container_highest : Theme.secondary
+        text: root.icons
+        wrapMode: Text.NoWrap
+        font.bold: true
         font.pixelSize: 22
 
         opacity: root.isEmpty ? 0 : 1
-        scale:   root.isEmpty ? 0.5 : (root.isFocused ? 1.1 : 1.0)
+        scale: root.isEmpty ? 0.5 : (root.isFocused ? 1.1 : 1.0)
 
-        Behavior on scale   { Anim { type: Anim.DefaultSpatial } }
-        Behavior on opacity { Anim { type: Anim.DefaultSpatial } }
-        Behavior on color   { Anim { type: Anim.DefaultSpatial } }
+        Behavior on scale {
+            Anim {
+                type: Anim.DefaultSpatial
+            }
+        }
+        Behavior on opacity {
+            Anim {
+                type: Anim.DefaultSpatial
+            }
+        }
+        Behavior on color {
+            Anim {
+                type: Anim.DefaultSpatial
+            }
+        }
     }
 
     // --- Contenido: punto indicador (workspace vacío) ---
@@ -82,28 +95,46 @@ readonly property string icons: windows.slice(0, 3)
         anchors.centerIn: parent
         visible: root.isEmpty
 
-        width:  8
+        width: 8
         height: 8
         radius: width / 2
 
-        color:   root.isFocused ? Theme.surface_container_highest : Theme.outline_variant
+        color: root.isFocused ? Theme.surface_container_highest : Theme.outline_variant
         opacity: root.isEmpty ? 1 : 0
-        scale:   root.isFocused ? 1.2 : 1.0
+        scale: root.isFocused ? 1.2 : 1.0
 
-        Behavior on scale   { Anim { type: Anim.DefaultSpatial } }
-        Behavior on opacity { Anim { type: Anim.DefaultSpatial } }
-        Behavior on color   { Anim { type: Anim.DefaultSpatial } }
+        Behavior on scale {
+            Anim {
+                type: Anim.DefaultSpatial
+            }
+        }
+        Behavior on opacity {
+            Anim {
+                type: Anim.DefaultSpatial
+            }
+        }
+        Behavior on color {
+            Anim {
+                type: Anim.DefaultSpatial
+            }
+        }
     }
 
     // --- Interacción ---
-    StateLayer {
+    Loader {
         anchors.fill: parent
-        effectColor:  Theme.primary
-        radius:       Tokens.appearance.rounding.full
+        active: !root.isFocused
+        sourceComponent: Component {
+            StateLayer {
+                anchors.fill: parent
+                effectColor: Theme.primary
+                radius: Tokens.appearance.rounding.full
 
-        onClicked: {
-            if (root.modelData)
-                root.modelData.activate()
+                onClicked: {
+                    if (root.modelData && !root.isFocused)
+                        root.modelData.activate();
+                }
+            }
         }
     }
 }

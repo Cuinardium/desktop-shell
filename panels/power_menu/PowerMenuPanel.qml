@@ -20,7 +20,7 @@ PanelWindow {
 
     readonly property bool isVisibleOrAnimating: ShellState.powerMenuOpen || slidingContainer.x > -totalWidth
 
-    property int totalWidth: 64
+    property int totalWidth: 66
     implicitWidth: ShellState.powerMenuOpen || slideAnim.running ? totalWidth : 0
     implicitHeight: buttons.implicitHeight + totalWidth * 1.5
 
@@ -42,17 +42,23 @@ PanelWindow {
         focus: true
 
         Keys.onEscapePressed: ShellState.powerMenuOpen = false
-        onVisibleChanged: if (ShellState.powerMenuOpen) forceActiveFocus()
+        onVisibleChanged: if (ShellState.powerMenuOpen)
+            forceActiveFocus()
 
         Item {
             id: slidingContainer
             width: panel.totalWidth
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            x: ShellState.powerMenuOpen ? 0 : -totalWidth
+            // The animatio has a slight overshoot, so we need to compensate for that (-2)
+            // if it was 0, there would be a small gap between the panel and the screen while it overshoots
+            x: ShellState.powerMenuOpen ? -2 : -totalWidth
 
             Behavior on x {
-                Anim { id: slideAnim; type: Anim.SlowSpatial }
+                Anim {
+                    id: slideAnim
+                    type: Anim.SlowSpatial
+                }
             }
 
             FlaredLeftBackground {
@@ -62,10 +68,9 @@ PanelWindow {
             }
 
             PowerMenuButtons {
-                anchors.centerIn: parent
                 id: buttons
+                anchors.centerIn: parent
             }
-
         }
     }
 }

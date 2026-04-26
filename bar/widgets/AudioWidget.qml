@@ -24,7 +24,9 @@ ProgressIcon {
     // Set properties based on audio state
     clickable: true
     progress: root.animatedVolume
-    iconName: Audio.muted ? "volume_off" : root.animatedVolume > 0 ? (root.animatedVolume <= 0.4 ? "volume_down" : "volume_up") : "volume_mute"
+    readonly property bool hasVolume: root.animatedVolume > 0
+    readonly property bool isLowVolume: root.animatedVolume <= 0.4
+    iconName: Audio.muted ? "volume_off" : (!hasVolume ? "volume_mute" : (isLowVolume ? "volume_down" : "volume_up"))
     color: Audio.muted ? Theme.error : Theme.primary
 
     // Animate the color transition when muting/unmuting

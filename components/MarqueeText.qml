@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
-import Qt5Compat.GraphicalEffects
+import QtQuick.Effects
 
 import qs.style
 import qs.style.motions
@@ -96,13 +96,13 @@ Item {
                 running: true
             }
 
-            LinearGradient {
+            Rectangle {
                 id: localGradient
                 anchors.fill: parent
-                start: Qt.point(0, 0)
-                end: Qt.point(parent.width, 0)
                 visible: false
+                layer.enabled: true
                 gradient: Gradient {
+                    orientation: Gradient.Horizontal
                     GradientStop { position: 0.0;  color: "transparent" }
                     GradientStop { position: 0.08; color: "black" }
                     GradientStop { position: 0.85; color: "black" }
@@ -110,14 +110,16 @@ Item {
                 }
             }
 
-            OpacityMask {
+            MultiEffect {
                 anchors.fill: parent
                 source: scrollSource
+                maskEnabled: true
                 maskSource: localGradient
             }
 
             Connections {
                 target: marqueeRoot
+                enabled: marqueeRoot != null
                 function onTitleChanged() {
                     scrollRow.x = 0;
                     scrollAnim.restart();

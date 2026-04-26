@@ -7,8 +7,16 @@ import qs.components
 import qs.style
 
 RowLayout {
-    property var currentDevice: (Networking.devices.values.find(d => d.connected)) ?? null
+    readonly property var devices: Networking.devices.values
+    property var currentDevice: null
     property var connectivity: Networking.connectivity
+
+    function updateCurrentDevice() {
+        currentDevice = devices.find(device => device.connected) ?? null;
+    }
+
+    Component.onCompleted: updateCurrentDevice()
+    onDevicesChanged: updateCurrentDevice()
 
     property string icon: !currentDevice ? "wifi" : (currentDevice.type === DeviceType.Wired ? "lan" : "wifi")
 
