@@ -58,70 +58,64 @@ Singleton {
         return historyArray.slice();
     }
 
+    function poll() {
+        fileMeminfo.reload();
+        fileStat.reload();
+        fileTemp.reload();
+
+        // Parse Memory & Swap
+        const textMeminfo = fileMeminfo.text();
+        memoryTotal = Number(textMeminfo.match(/MemTotal:\s+(\d+)/)?.[1] || 1);
+        memoryFree = Number(textMeminfo.match(/MemAvailable:\s+(\d+)/)?.[1] || 0);
+        swapTotal = Number(textMeminfo.match(/SwapTotal:\s+(\d+)/)?.[1] || 1);
+        swapFree = Number(textMeminfo.match(/SwapFree:\s+(\d+)/)?.[1] || 0);
+
+        // Parse CPU Usage
+        const textStat = fileStat.text();
+        const cpuLine = textStat.split('\n')[0].trim().split(/\s+/);
+
+        if (cpuLine[0] === "cpu") {
+            const user = Number(cpuLine[1] || 0);
+            const nice = Number(cpuLine[2] || 0);
+            const system = Number(cpuLine[3] || 0);
+            const idle = Number(cpuLine[4] || 0);
+            const iowait = Number(cpuLine[5] || 0);
+            const irq = Number(cpuLine[6] || 0);
+            const softirq = Number(cpuLine[7] || 0);
+            const steal = Number(cpuLine[8] || 0);
+
+            const idleAll = idle + iowait;
+            const systemAll = system + irq + softirq;
+            const nonIdleAll = user + nice + systemAll + steal;
+            const total = idleAll + nonIdleAll;
+
+            if (previousCpuStats) {
+                const totalDiff = total - previousCpuStats.total;
+                const idleDiff = idleAll - previousCpuStats.idleAll;
+                cpuUsage = totalDiff > 0 ? (totalDiff - idleDiff) / totalDiff : 0;
+            }
+
+            previousCpuStats = { total: total, idleAll: idleAll };
+        }
+
+        // Parse CPU Temperature
+        const tempRaw = Number(fileTemp.text() || 0);
+        cpuTemp = tempRaw > 0 ? (tempRaw / 1000) : 0;
+
+        // Update Histories
+        memoryUsageHistory = pushToHistory(memoryUsageHistory, memoryUsedPercentage);
+        swapUsageHistory = pushToHistory(swapUsageHistory, swapUsedPercentage);
+        cpuUsageHistory = pushToHistory(cpuUsageHistory, cpuUsage);
+        cpuTempHistory = pushToHistory(cpuTempHistory, cpuTemp);
+    }
+
     Timer {
-        interval: 1 // Will be overwritten on first run
+        interval: 1
         running: true
         repeat: true
         onTriggered: {
-            // Reload recurring files
-            fileMeminfo.reload();
-            fileStat.reload();
-            fileTemp.reload();
-
-            // Parse Memory & Swap
-            const textMeminfo = fileMeminfo.text();
-            memoryTotal = Number(textMeminfo.match(/MemTotal:\s+(\d+)/)?.[1] || 1);
-            memoryFree = Number(textMeminfo.match(/MemAvailable:\s+(\d+)/)?.[1] || 0);
-            swapTotal = Number(textMeminfo.match(/SwapTotal:\s+(\d+)/)?.[1] || 1);
-            swapFree = Number(textMeminfo.match(/SwapFree:\s+(\d+)/)?.[1] || 0);
-
-            // Parse CPU Usage
-            const textStat = fileStat.text();
-            // Split the first line by whitespace
-            const cpuLine = textStat.split('\n')[0].trim().split(/\s+/);
-
-            if (cpuLine[0] === "cpu") {
-                // Parse the relevant columns (fallback to 0 if missing)
-                const user = Number(cpuLine[1] || 0);
-                const nice = Number(cpuLine[2] || 0);
-                const system = Number(cpuLine[3] || 0);
-                const idle = Number(cpuLine[4] || 0);
-                const iowait = Number(cpuLine[5] || 0);
-                const irq = Number(cpuLine[6] || 0);
-                const softirq = Number(cpuLine[7] || 0);
-                const steal = Number(cpuLine[8] || 0);
-
-                // Group the times according to standard top/htop formulas
-                const idleAll = idle + iowait;
-                const systemAll = system + irq + softirq;
-                const nonIdleAll = user + nice + systemAll + steal;
-                const total = idleAll + nonIdleAll;
-
-                if (previousCpuStats) {
-                    const totalDiff = total - previousCpuStats.total;
-                    const idleDiff = idleAll - previousCpuStats.idleAll;
-
-                    // Prevent division by zero
-                    cpuUsage = totalDiff > 0 ? (totalDiff - idleDiff) / totalDiff : 0;
-                }
-
-                previousCpuStats = {
-                    total: total,
-                    idleAll: idleAll
-                };
-            }
-
-            // Parse CPU Temperature
-            const tempRaw = Number(fileTemp.text() || 0);
-            cpuTemp = tempRaw > 0 ? (tempRaw / 1000) : 0;
-
-            // Update Histories
-            memoryUsageHistory = pushToHistory(memoryUsageHistory, memoryUsedPercentage);
-            swapUsageHistory = pushToHistory(swapUsageHistory, swapUsedPercentage);
-            cpuUsageHistory = pushToHistory(cpuUsageHistory, cpuUsage);
-            cpuTempHistory = pushToHistory(cpuTempHistory, cpuTemp);
-
-            interval = 3000;
+            root.poll();
+            interval = interval === 1 ? 500 : 3000;
         }
     }
 

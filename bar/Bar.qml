@@ -11,6 +11,8 @@ import qs.panels.power_menu
 import qs.style
 
 Scope {
+    readonly property string primaryScreen: "HDMI-A-1"
+
     Variants {
         model: Quickshell.screens
 
@@ -18,7 +20,7 @@ Scope {
             id: bar
 
             required property var modelData
-            readonly property bool isPrimary: modelData.name === "HDMI-A-1"
+            readonly property bool isPrimary: modelData.name === primaryScreen
 
             property var hyprland_monitor: {
                 // If the screen data isn't fully loaded yet, wait.
@@ -62,7 +64,7 @@ Scope {
     // Power Menu Panel
     PowerMenuPanel {
         id: powerMenuPanel
-        screen: Quickshell.screens.find(s => s.name === "HDMI-A-1")
+        screen: Quickshell.screens.find(s => s.name === primaryScreen)
     }
 
     // ==========================================

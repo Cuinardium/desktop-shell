@@ -87,11 +87,16 @@ Item {
         }
     }
 
-    StateLayer {
-        radius: Tokens.appearance.rounding.full
-        effectColor: root.color
-        onClicked: root.clicked()
-        onWheeled: wheel => root.wheeled(wheel)
-        visible: root.clickable
+    Loader {
+        anchors.fill: parent
+        active: root.clickable
+        sourceComponent: Component {
+            StateLayer {
+                radius: Tokens.appearance.rounding.full
+                effectColor: root.color
+                onClicked: root.clicked()
+                onWheeled: wheel => root.wheeled(wheel)
+            }
+        }
     }
 }

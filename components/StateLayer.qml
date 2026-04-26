@@ -37,8 +37,8 @@ Item {
         id: effectContainer
         anchors.fill: parent
         
-        // This is the magic that clips the contents to the maskRect's radius
-        layer.enabled: true
+        // Allocate FBO only during interaction — idle instances cost no VRAM
+        layer.enabled: mouseArea.containsMouse || pressAnim.running || releaseAnim.running
         layer.effect: OpacityMask {
             maskSource: maskRect
         }

@@ -9,6 +9,11 @@ Canvas {
     anchors.leftMargin: 0
     anchors.rightMargin: 0
 
+    Connections {
+        target: Theme
+        function onBackgroundChanged() { background.requestPaint() }
+    }
+
     onPaint: {
         var ctx = getContext("2d");
         ctx.reset();
