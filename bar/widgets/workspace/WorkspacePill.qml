@@ -23,15 +23,15 @@ Item {
     signal focusedGeometryChanged(real x, real width)
 
     // --- Propiedades derivadas del modelo ---
-    readonly property bool isCurrentMonitor: modelData.monitor.name === root.monitor.name
+    readonly property bool isCurrentMonitor: !!root.monitor && !!modelData?.monitor && (modelData.monitor.name === root.monitor.name)
     readonly property bool isActive:         modelData.active
     readonly property bool isFocused:        modelData.focused
     readonly property var  windows:          modelData.toplevels.values
     readonly property bool isEmpty:          windows.length <= 0
     readonly property bool hasManyWindows:   windows.length > 1
-    readonly property string icons:          windows.slice(0, 3)
-                                                .map(t => IconMap.getMatch(t.wayland.appId).icon)
-                                                .join(" ")
+readonly property string icons: windows.slice(0, 3)
+        .map(t => IconMap.getMatch(t?.wayland?.appId ?? "").icon)
+        .join(" ")
 
     // --- Sizing ---
     height: 22

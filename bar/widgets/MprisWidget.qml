@@ -81,7 +81,7 @@ Rectangle {
             }
 
             Connections {
-                target: pill.activePlayer
+                target: pill.activePlayer ?? null
                 function onPlaybackStateChanged() {
                     if (!pill.activePlayer)
                     return;

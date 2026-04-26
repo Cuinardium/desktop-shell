@@ -7,17 +7,19 @@ import qs.components
 import qs.style
 
 RowLayout {
-    property var currentDevice: Networking.devices.values.find(d => d.connected)
+    property var currentDevice: (Networking.devices.values.find(d => d.connected)) ?? null
     property var connectivity: Networking.connectivity
 
-    property string icon: currentDevice.type === DeviceType.Wired ? "lan" : "wifi"
+    property string icon: !currentDevice ? "wifi" : (currentDevice.type === DeviceType.Wired ? "lan" : "wifi")
 
     MaterialIcon {
         color: Theme.primary
         text: icon
+        visible: !!currentDevice
     }
 
     StyledText {
-        text: currentDevice.name
+        text: currentDevice?.name ?? ""
+        visible: !!currentDevice
     }
 }
