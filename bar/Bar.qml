@@ -9,9 +9,10 @@ import qs.bar.widgets.workspace
 import qs.bar.widgets
 import qs.panels.power_menu
 import qs.style
+import qs
 
 Scope {
-    readonly property string primaryScreen: "HDMI-A-1"
+    required property string primaryScreen
 
     Variants {
         model: Quickshell.screens
@@ -59,12 +60,6 @@ Scope {
                 property var monitorBridge: bar.hyprland_monitor
             }
         }
-    }
-
-    // Power Menu Panel
-    PowerMenuPanel {
-        id: powerMenuPanel
-        screen: Quickshell.screens.find(s => s.name === primaryScreen)
     }
 
     // ==========================================

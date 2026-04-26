@@ -1,14 +1,10 @@
 pragma ComponentBehavior: Bound
 import QtQuick
-import QtQuick.Layouts
 import Quickshell
-import Quickshell.Wayland
 import Quickshell.Hyprland
 
 import qs
-import qs.style
 import qs.style.motions
-import qs.services
 import qs.components
 
 PanelWindow {
@@ -52,7 +48,7 @@ PanelWindow {
             anchors.bottom: parent.bottom
             // The animatio has a slight overshoot, so we need to compensate for that (-2)
             // if it was 0, there would be a small gap between the panel and the screen while it overshoots
-            x: ShellState.powerMenuOpen ? -2 : -totalWidth
+            x: ShellState.powerMenuOpen ? -2 : -panel.totalWidth
 
             Behavior on x {
                 Anim {
@@ -61,10 +57,10 @@ PanelWindow {
                 }
             }
 
-            FlaredLeftBackground {
+            LeftFlaredBackground {
                 anchors.fill: parent
-                flareRadius: totalWidth / 2
-                cornerRadius: totalWidth / 2
+                flareRadius: panel.totalWidth / 2
+                cornerRadius: panel.totalWidth / 2
             }
 
             PowerMenuButtons {
