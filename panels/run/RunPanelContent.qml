@@ -5,33 +5,12 @@ import Quickshell
 
 import qs.components
 import qs.style
+import qs.services
 import qs
 
 Item {
     id: root
     anchors.fill: parent
-
-    property var filteredApps: []
-
-    function updateFilter() {
-        var term = searchField.text.toLowerCase()
-        var results = []
-        var allEntries = DesktopEntries.applications.values
-        for (var i = 0; i < allEntries.length; i++) {
-            var entry = allEntries[i]
-            if (entry.name.toLowerCase().indexOf(term) !== -1 ||
-               (entry.genericName && entry.genericName.toLowerCase().indexOf(term) !== -1)) {
-                results.push(entry)
-            }
-        }
-        filteredApps = results
-        appList.currentIndex = 0
-    }
-
-    Connections {
-        target: DesktopEntries
-        function onApplicationsChanged() { root.updateFilter() }
-    }
 
     Connections {
         target: ShellState
@@ -39,11 +18,11 @@ Item {
             if (ShellState.runMenuOpen) {
                 searchField.text = ""
                 searchField.forceActiveFocus()
+                Applications.search("")
+                appList.currentIndex = 0
             }
         }
     }
-
-    Component.onCompleted: updateFilter()
 
     ColumnLayout {
         anchors.fill: parent
@@ -56,7 +35,7 @@ Item {
             clip: true
             spacing: 2
 
-            model: root.filteredApps
+            model: Applications.filteredApps
 
             preferredHighlightBegin: 0
             preferredHighlightEnd: height - 56
@@ -113,7 +92,7 @@ Item {
                             Layout.fillWidth: true
                             text: delegateItem.modelData.name
                             color: delegateItem.selected ? Theme.primary : Theme.on_surface
-                            font.pixelSize: Tokens.appearance.fontSize.normal
+                            font.pointSize: Tokens.appearance.fontSize.small
                             font.weight: Font.Medium
                             elide: Text.ElideRight
                         }
@@ -122,7 +101,7 @@ Item {
                             Layout.fillWidth: true
                             text: delegateItem.modelData.genericName || ""
                             color: Theme.on_surface_variant
-                            font.pixelSize: Tokens.appearance.fontSize.small
+                            font.pointSize: Tokens.appearance.fontSize.smaller
                             elide: Text.ElideRight
                             visible: text.length > 0
                         }
@@ -147,7 +126,6 @@ Item {
 
                 MaterialIcon {
                     text: "search"
-                    font.pixelSize: Tokens.appearance.fontSize.larger
                     color: Theme.primary
                     verticalAlignment: Text.AlignVCenter
                 }
@@ -169,18 +147,27 @@ Item {
                         visible: !parent.text
                     }
 
-                    onTextChanged: root.updateFilter()
+                    onTextChanged: {
+                        Applications.search(text)
+                        appList.currentIndex = 0
+                    }
 
                     Keys.onDownPressed: { appList.incrementCurrentIndex(); (event) => event.accepted = true }
                     Keys.onUpPressed: { appList.decrementCurrentIndex(); (event) => event.accepted = true }
                     Keys.onTabPressed: { appList.incrementCurrentIndex(); (event) => event.accepted = true }
                     Keys.onBacktabPressed: { appList.decrementCurrentIndex(); (event) => event.accepted = true }
-                    Keys.onReturnPressed: { root.launchCurrent(); (event) => event.accepted = true }
+                    Keys.onReturnPressed: { 
+                        if (Applications.launch(appList.currentIndex)) {
+                            ShellState.runMenuOpen = false
+                            searchField.text = ""
+                        }
+
+                        (event) => event.accepted = true 
+                    }
                 }
 
                 MaterialIcon {
                     text: "close"
-                    font.pixelSize: Tokens.appearance.fontSize.normal
                     color: Theme.on_surface_variant
                     verticalAlignment: Text.AlignVCenter
                     visible: searchField.text.length > 0
