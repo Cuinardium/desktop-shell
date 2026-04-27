@@ -23,6 +23,7 @@ PanelWindow {
     exclusionMode: ExclusionMode.Ignore
     focusable: true
     visible: isVisibleOrAnimating
+
     color: "transparent"
 
     HyprlandFocusGrab {

@@ -15,4 +15,10 @@ Item {
         screen: Quickshell.screens.find(s => s.name === panelsRoot.targetScreen)
         // Note: Make sure PowerMenuPanel internally binds its visibility/animations to ShellState.powerMenuOpen
     }
+
+    RunPanel {
+        id: runPanel
+        screen: Quickshell.screens.find(s => s.name === panelsRoot.targetScreen)
+        // Note: Make sure RunPanel internally binds its visibility/animations to ShellState.runMenuOpen
+    }
 }

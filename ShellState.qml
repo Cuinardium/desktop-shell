@@ -6,4 +6,5 @@ Singleton {
     id: root
 
     property bool powerMenuOpen: false
+    property bool runMenuOpen: false
 }
