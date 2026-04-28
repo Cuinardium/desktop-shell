@@ -1,7 +1,7 @@
 pragma ComponentBehavior: Bound
 import QtQuick
 import QtQuick.Layouts
-import Quickshell
+import Quickshell.Widgets
 
 import qs.components
 import qs.style
@@ -74,12 +74,10 @@ Item {
                         color: "transparent"
                         clip: true
 
-                        Image {
+                        IconImage {
                             anchors.fill: parent
                             anchors.margins: 4
                             source: delegateItem.modelData.icon ? ("image://icon/" + delegateItem.modelData.icon) : ""
-                            fillMode: Image.PreserveAspectFit
-                            smooth: true
                             mipmap: true
                         }
                     }

@@ -6,18 +6,16 @@ import QtQuick
 Singleton {
     id: iconMapper
 
-    property var _memoizedMatches: ({})
-
-    readonly property var map: {
+    readonly property var id_map: {
         // Misc
         // "qbittorrent": {
         //     title: "QBittorrent",
         //     icon: ""
         // },
-        "rofi": {
-            title: "Rofi",
-            icon: ""
-        },
+        // "rofi": {
+        //     title: "Rofi",
+        //     icon: ""
+        // },
 
         // Browsers
         // "brave-browser": {
@@ -78,10 +76,10 @@ Singleton {
         //     title: "Alacritty",
         //     icon: ""
         // },
-        "com.mitchellh.ghostty": {
-            title: "Ghostty",
-            icon: "󰊠"
-        },
+        // "com.mitchellh.ghostty": {
+        //     title: "Ghostty",
+        //     icon: "󰊠"
+        // },
         // "foot": {
         //     title: "Foot Terminal",
         //     icon: "󰽒"
@@ -90,10 +88,10 @@ Singleton {
         //     title: "GNOME Terminal",
         //     icon: ""
         // },
-        // "kitty": {
-        //     title: "Kitty Terminal",
-        //     icon: "󰄛"
-        // },
+        "kitty": {
+            title: "Kitty",
+            icon: ""
+        },
         // "konsole": {
         //     title: "Konsole",
         //     icon: ""
@@ -400,9 +398,36 @@ Singleton {
         //     title: "Dropbox",
         //     icon: "󰇣"
         // }
+
+        // Custom ids
+        "lofi.player": {
+            title: "Lofi Player",
+            icon: "󰥠"
+        },
+        "yazi": {
+            title: "Yazi",
+            icon: "󰇥"
+        },
+        "term.float": {
+            title: "Kitty",
+            icon: "󰄛"
+        }
     }
 
-    function getMatch(appId) {
+    readonly property var title_map: {
+        "youtube": "",
+        "microsoft teams": "󰊻",
+        "whatsapp": "󰖣",
+        "nv": "",
+        "nvim": "",
+        "git": "",
+        "claude": "󱚝",
+        "opencode": "󱜙",
+    }
+
+
+
+    function getMatchById(appId) {
         if (!appId) {
             return {
                 title: "Desktop",
@@ -412,22 +437,38 @@ Singleton {
 
         const key = String(appId).toLowerCase();
 
-        const cached = _memoizedMatches[key];
-        if (cached !== undefined)
-            return cached;
-
         let match;
 
-        if (map[key] !== undefined)
-            match = map[key];
+        if (id_map[key] !== undefined)
+            match = id_map[key];
         else
             match = {
                 title: "Unknown",
                 icon: "󰣆"
             };
 
-        _memoizedMatches[key] = match;
-
         return match;
+    }
+
+    function getMatch(appId, title) {
+        const match = getMatchById(appId);
+
+        const resp = { title: match.title, icon: match.icon };
+
+        const appsToSearch = [
+            "Firefox",
+            "Kitty"
+        ]
+
+
+        if (appsToSearch.includes(match.title)) {
+            const matchedTitle = Object.keys(title_map).find(key => title.toLowerCase().includes(key));
+            if (matchedTitle) {
+                resp.icon = title_map[matchedTitle];
+            }
+
+        }
+
+        return resp;
     }
 }

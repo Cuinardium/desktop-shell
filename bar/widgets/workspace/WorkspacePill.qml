@@ -29,7 +29,27 @@ Item {
     readonly property var windows: modelData.toplevels.values
     readonly property bool isEmpty: windows.length <= 0
     readonly property bool hasManyWindows: windows.length > 1
-    readonly property string icons: windows.slice(0, 3).map(t => IconMap.getMatch(t?.wayland?.appId ?? "").icon).join(" ")
+    property int _iconRevision: 0
+
+    Instantiator {
+        model: root.modelData?.toplevels ?? null
+        delegate: Connections {
+            required property var modelData   // cada toplevel
+            target: modelData?.wayland ?? null
+
+            function onTitleChanged() {
+                root._iconRevision++;
+            }
+            function onAppIdChanged() {
+                root._iconRevision++;
+            }
+        }
+    }
+
+    // icons ahora depende de _iconRevision → se re-evalúa ante cualquier cambio
+    property string icons: {
+        return windows.map(t => IconMap.getMatch(t?.wayland?.appId ?? "", t?.title ?? "").icon).join(" ");
+    }
 
     // --- Sizing ---
     height: 22
@@ -63,7 +83,7 @@ Item {
         anchors.centerIn: parent
         visible: !root.isEmpty
 
-        color: root.isFocused ? Theme.surface_container_highest : Theme.secondary
+        color: root.isFocused ? Theme.surface_container_highest : (root.isActive ? Theme.primary : Theme.secondary)
         text: root.icons
         wrapMode: Text.NoWrap
         font.bold: true
@@ -99,7 +119,7 @@ Item {
         height: 8
         radius: width / 2
 
-        color: root.isFocused ? Theme.surface_container_highest : Theme.outline_variant
+        color: root.isFocused ? Theme.surface_container_highest : (root.isActive ? Theme.primary : Theme.outline_variant)
         opacity: root.isEmpty ? 1 : 0
         scale: root.isFocused ? 1.2 : 1.0
 

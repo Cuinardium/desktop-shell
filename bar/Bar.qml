@@ -78,14 +78,18 @@ Scope {
                 anchors.left: parent.left
                 anchors.leftMargin: Tokens.appearance.padding.small
                 anchors.verticalCenter: parent.verticalCenter
-                spacing: Tokens.appearance.spacing.small
+                spacing: Tokens.appearance.spacing.larger
 
                 PowerButton {
                     id: powerButton
                 }
-                ResourcesWidget {}
-                AudioWidget {}
-                MprisWidget {}
+                ResourcesWidget {
+                }
+                RowLayout {
+                    spacing: Tokens.appearance.spacing.smaller
+                    AudioWidget {}
+                    MprisWidget {}
+                }
             }
 
             WorkspacesWidget {

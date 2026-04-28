@@ -11,6 +11,7 @@ Item {
     required property string title
     property color textColor: Theme.primary
     property real textOpacity: 1
+    property bool scrollEnabled: false
     readonly property int gap: Tokens.appearance.spacing.large
     readonly property int maxWidth: 200
 
@@ -27,6 +28,15 @@ Item {
     SwapMotion on title {
         item: text1
         enabled: text1.text !== ""
+    }
+
+    signal wheeled(var wheel)
+    StateLayer {
+        visible: marqueeRoot.scrollEnabled
+        onWheeled: wheel => {
+            marqueeRoot.wheeled(wheel);
+        }
+        effectColor: "transparent"
     }
 
     // --- Static display (not scrolling) ---

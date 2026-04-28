@@ -11,7 +11,9 @@ import qs.style.motions
 Rectangle {
     id: pill
 
-    property var activePlayer: Mpris.players.values?.[0] ?? null
+    property var playerIndex: 0
+
+    property var activePlayer: Mpris.players.values?.[playerIndex] ?? null
 
     readonly property bool isActive: activePlayer != null
 
@@ -69,7 +71,13 @@ Rectangle {
             Layout.preferredWidth: 22
             Layout.preferredHeight: 22
 
-            progress: pill.hasProgress ? activePlayer.position / activePlayer.length : 1
+            progress: pill.hasProgress ? pill.activePlayer.position / pill.activePlayer.length : 1
+
+            Behavior on progress {
+                Anim {
+                    type: Anim.Standard
+                }
+            }
 
             // Debounce: evita que el ícono parpadee al cambiar de track.
             property bool debouncedPlaying: pill.activePlayer?.isPlaying ?? false
@@ -78,6 +86,13 @@ Rectangle {
                 id: debounceTimer
                 interval: 200
                 onTriggered: playPauseIcon.debouncedPlaying = false
+            }
+            Connections {
+                target: pill
+                function onActivePlayerChanged() {
+                    debounceTimer.stop();
+                    playPauseIcon.debouncedPlaying = pill.activePlayer?.isPlaying ?? false;
+                }
             }
 
             Connections {
@@ -99,7 +114,7 @@ Rectangle {
             onClicked: pill.activePlayer?.togglePlaying()
             onWheeled: wheel => {
                 if (!pill.canSeek)
-                return;
+                    return;
                 // anngleDelta.y: 120 per stantdard wheel notch in most mouses -> 5s per notch
                 const notches = wheel.angleDelta.y / 120;
                 pill.activePlayer?.seek(notches * 5);
@@ -109,6 +124,17 @@ Rectangle {
         MarqueeText {
             title: pill.activePlayer?.trackTitle ?? ""
             Layout.maximumWidth: maxWidth
+            scrollEnabled: Mpris?.players.values.length > 1
+            onWheeled: wheel => {
+                const playerCount = Mpris?.players.values.length ?? 0;
+                var newIndex = pill.playerIndex + (wheel.angleDelta.y > 0 ? 1 : -1);
+                if (newIndex < 0)
+                    newIndex = playerCount - 1;
+                else if (newIndex >= playerCount)
+                    newIndex = 0;
+
+                pill.playerIndex = newIndex;
+            }
         }
     }
 }
